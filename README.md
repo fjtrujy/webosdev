@@ -4,6 +4,19 @@ Containerized native development environment for LG webOS televisions, targeting
 32-bit ARM (arm-webos-linux-gnueabi) from Linux ARM64 hosts. This is not a
 webOS OSE SDK or a browser application environment.
 
+## Base image
+
+The default image uses Node.js 24 on Alpine Linux. The upstream Linux ARM64
+SDK is glibc-linked; Alpine gcompat alone cannot satisfy its GCC dependencies.
+A small set of real Debian Bookworm glibc runtime libraries is copied from a
+separate build stage, with their copyright notices. The rest of the final
+image uses Alpine packages and musl. This changes only the host environment,
+not the ARMv7 webOS target sysroot.
+
+The original Debian-based image is available at the initial commit SHA tag
+`4b80f81cf33418cf79da5d55f8bcb2ae3f5ca34b`. Both MM2 renderer variants and the
+standalone SDL/IPK smoke test passed locally on the Alpine image.
+
 ## Build locally
 
 ```sh
