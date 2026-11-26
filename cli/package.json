@@ -1,0 +1,9 @@
+{
+  "name": "webosdev-packaging",
+  "version": "1.0.0",
+  "license": "ISC",
+  "dependencies": {
+    "@webos-tools/cli": "3.2.6"
+  },
+  "private": true
+}

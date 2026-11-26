@@ -1,0 +1,9 @@
+**
+!Dockerfile
+!sdk-checksums.sha256
+!cli/
+!cli/package.json
+!cli/package-lock.json
+!.cache/
+!.cache/arm-webos-linux-gnueabi_sdk-buildroot_linux-aarch64.tar.bz2
+!.cache/SDL2-2.30.12-webos.tar.gz

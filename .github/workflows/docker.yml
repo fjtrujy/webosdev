@@ -1,0 +1,42 @@
+name: Docker
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Fetch and verify SDK
+        run: ./fetch-sdk.sh
+      - name: Build ARM64 image
+        run: docker build --platform linux/arm64 -t webosdev:test .
+      - name: Validate toolchain and packaging
+        run: docker run --rm -v "$PWD/tests:/tests:ro" webosdev:test sh /tests/smoke.sh
+      - name: Publish image
+        if: github.event_name != 'pull_request'
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker tag webosdev:test "$IMAGE:$GITHUB_SHA"
+          docker push "$IMAGE:$GITHUB_SHA"
+          if [ "$GITHUB_REF" = refs/heads/main ]; then
+            docker tag webosdev:test "$IMAGE:latest"
+            docker push "$IMAGE:latest"
+          elif [ "$GITHUB_REF_TYPE" = tag ]; then
+            docker tag webosdev:test "$IMAGE:$GITHUB_REF_NAME"
+            docker push "$IMAGE:$GITHUB_REF_NAME"
+          fi
